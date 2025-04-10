@@ -1,0 +1,829 @@
+﻿@model IEnumerable<Parcial.Models.mesas>
+@{
+    ViewData["Title"] = "Dashboard de Gerencia";
+    Layout = "_Layout";
+    var meseros = ViewBag.Meseros as IEnumerable<Parcial.Models.meseros>;
+    var platos = ViewBag.Platos as IEnumerable<Parcial.Models.platos>;
+    var cocineros = ViewBag.Cocineros as IEnumerable<Parcial.Models.cocineros>;
+}
+
+@section Styles {
+    <style>
+        :root {
+            --primary-color: #3498db;
+            --secondary-color: #2ecc71;
+            --danger-color: #e74c3c;
+            --warning-color: #f39c12;
+            --info-color: #1abc9c;
+            --dark-color: #2c3e50;
+            --light-color: #ecf0f1;
+            --chef-color: #9b59b6;
+            --food-color: #e67e22;
+        }
+
+        .dashboard-header {
+            background: linear-gradient(135deg, var(--dark-color) 0%, #34495e 100%);
+            color: white;
+            padding: 25px 0;
+            margin-bottom: 30px;
+            border-bottom: 5px solid var(--primary-color);
+        }
+
+        .dashboard-title {
+            font-weight: 700;
+            font-size: 2.2rem;
+            margin-bottom: 10px;
+        }
+
+        .dashboard-subtitle {
+            opacity: 0.9;
+            font-size: 1.1rem;
+        }
+
+        .card {
+            border-radius: 12px;
+            box-shadow: 0 6px 15px rgba(0,0,0,0.1);
+            margin-bottom: 25px;
+            border: none;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            overflow: hidden;
+        }
+
+            .card:hover {
+                transform: translateY(-5px);
+                box-shadow: 0 12px 20px rgba(0,0,0,0.15);
+            }
+
+        .card-header {
+            color: white;
+            border-radius: 12px 12px 0 0 !important;
+            font-weight: 600;
+            padding: 15px 20px;
+            border-bottom: none;
+            display: flex;
+            align-items: center;
+        }
+
+            .card-header i {
+                margin-right: 10px;
+                font-size: 1.2rem;
+            }
+
+        .mesero-item, .plato-item, .cocinero-item {
+            padding: 12px 0;
+            border-bottom: 1px solid rgba(0,0,0,0.05);
+            display: flex;
+            align-items: center;
+            transition: all 0.2s ease;
+        }
+
+            .mesero-item:hover, .plato-item:hover, .cocinero-item:hover {
+                background-color: rgba(0,0,0,0.02);
+                transform: translateX(5px);
+            }
+
+        .mesa-item {
+            margin-bottom: 10px;
+            padding: 12px 15px;
+            border-radius: 8px;
+            color: white;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            transition: transform 0.2s ease;
+        }
+
+            .mesa-item:hover {
+                transform: translateX(5px);
+            }
+
+            .mesa-item i {
+                margin-right: 8px;
+            }
+
+        .mesa-libre {
+            background: linear-gradient(135deg, var(--secondary-color) 0%, #27ae60 100%);
+        }
+
+        .mesa-ocupada {
+            background: linear-gradient(135deg, var(--danger-color) 0%, #c0392b 100%);
+        }
+
+        .mesa-reservada {
+            background: linear-gradient(135deg, var(--warning-color) 0%, #e67e22 100%);
+        }
+
+        .status-summary {
+            display: flex;
+            justify-content: space-around;
+            margin-bottom: 20px;
+            padding: 15px;
+            background-color: #f8f9fa;
+            border-radius: 10px;
+            box-shadow: inset 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        .status-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .mesero-avatar, .cocinero-avatar {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 12px;
+            font-weight: bold;
+            font-size: 1.1rem;
+            box-shadow: 0 3px 6px rgba(0,0,0,0.1);
+        }
+
+        .mesero-avatar {
+            background: linear-gradient(135deg, var(--primary-color) 0%, #2980b9 100%);
+        }
+
+        .cocinero-avatar {
+            background: linear-gradient(135deg, var(--chef-color) 0%, #8e44ad 100%);
+        }
+
+        .plato-img {
+            width: 55px;
+            height: 55px;
+            border-radius: 8px;
+            object-fit: cover;
+            margin-right: 15px;
+            box-shadow: 0 3px 6px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease;
+        }
+
+            .plato-img:hover {
+                transform: scale(1.1);
+            }
+
+        .stats-card {
+            text-align: center;
+            padding: 25px 15px;
+            border-radius: 12px;
+            margin-bottom: 25px;
+            color: white;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 6px 15px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease;
+        }
+
+            .stats-card:hover {
+                transform: translateY(-5px);
+            }
+
+            .stats-card::before {
+                content: '';
+                position: absolute;
+                top: -20px;
+                right: -20px;
+                width: 80px;
+                height: 80px;
+                border-radius: 50%;
+                background: rgba(255,255,255,0.1);
+            }
+
+            .stats-card i {
+                font-size: 2.8rem;
+                margin-bottom: 15px;
+                opacity: 0.9;
+            }
+
+            .stats-card .stats-value {
+                font-size: 2rem;
+                font-weight: bold;
+                margin-bottom: 5px;
+            }
+
+            .stats-card .stats-label {
+                font-size: 1rem;
+                opacity: 0.9;
+                letter-spacing: 0.5px;
+            }
+
+        .card-meseros {
+            background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+        }
+
+        .card-ventas {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        }
+
+        .card-cocineros {
+            background: linear-gradient(135deg, var(--chef-color) 0%, #8e44ad 100%);
+        }
+
+        .card-platos {
+            background: linear-gradient(135deg, var(--food-color) 0%, #d35400 100%);
+        }
+
+        .card-mesas {
+            background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+        }
+
+        .card-pedidos {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+        }
+
+        .progress-thin {
+            height: 6px;
+            margin-top: 8px;
+            border-radius: 3px;
+            background-color: rgba(255,255,255,0.2);
+        }
+
+        .progress-bar {
+            border-radius: 3px;
+        }
+
+        .table-responsive {
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+
+        .table {
+            margin-bottom: 0;
+        }
+
+            .table thead th {
+                background-color: var(--primary-color);
+                color: white;
+                border: none;
+                padding: 12px 15px;
+                font-weight: 600;
+            }
+
+            .table tbody tr {
+                transition: background-color 0.2s ease;
+            }
+
+                .table tbody tr:hover {
+                    background-color: rgba(52, 152, 219, 0.05);
+                }
+
+            .table tbody td {
+                padding: 12px 15px;
+                vertical-align: middle;
+                border-top: 1px solid rgba(0,0,0,0.03);
+            }
+
+        .badge-status {
+            padding: 6px 10px;
+            border-radius: 20px;
+            font-weight: 500;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .btn-outline-custom {
+            border: 2px solid;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+            .btn-outline-custom:hover {
+                color: white;
+            }
+
+        .empty-state {
+            text-align: center;
+            padding: 30px;
+            color: #7f8c8d;
+        }
+
+            .empty-state i {
+                font-size: 3rem;
+                margin-bottom: 15px;
+                opacity: 0.5;
+            }
+
+            .empty-state p {
+                font-size: 1.1rem;
+            }
+
+        .floating-action {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            z-index: 1000;
+        }
+
+        .floating-btn {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary-color) 0%, #2980b9 100%);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 6px 20px rgba(0,0,0,0.2);
+            transition: all 0.3s ease;
+            border: none;
+        }
+
+            .floating-btn:hover {
+                transform: translateY(-3px) scale(1.05);
+                box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+                color: white;
+            }
+
+        .mesa-status-indicator {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-right: 8px;
+        }
+
+        .mesa-status-libre {
+            background-color: var(--secondary-color);
+        }
+
+        .mesa-status-ocupada {
+            background-color: var(--danger-color);
+        }
+
+        .mesa-status-reservada {
+            background-color: var(--warning-color);
+        }
+
+        .pedido-status {
+            display: flex;
+            align-items: center;
+        }
+
+        .pedido-status-indicator {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            margin-right: 8px;
+        }
+
+        .status-preparacion {
+            background-color: #f39c12;
+        }
+
+        .status-listo {
+            background-color: #2ecc71;
+        }
+
+        .status-entregado {
+            background-color: #3498db;
+        }
+
+        .card-header-primary {
+            background: linear-gradient(135deg, var(--primary-color) 0%, #2980b9 100%);
+        }
+
+        .card-header-success {
+            background: linear-gradient(135deg, var(--secondary-color) 0%, #27ae60 100%);
+        }
+
+        .card-header-danger {
+            background: linear-gradient(135deg, var(--danger-color) 0%, #c0392b 100%);
+        }
+
+        .card-header-warning {
+            background: linear-gradient(135deg, var(--warning-color) 0%, #e67e22 100%);
+        }
+
+        .card-header-info {
+            background: linear-gradient(135deg, var(--info-color) 0%, #16a085 100%);
+        }
+
+        .card-header-chef {
+            background: linear-gradient(135deg, var(--chef-color) 0%, #8e44ad 100%);
+        }
+
+        .card-header-food {
+            background: linear-gradient(135deg, var(--food-color) 0%, #d35400 100%);
+        }
+
+        .platos-count {
+            background-color: rgba(155, 89, 182, 0.1);
+            color: var(--chef-color);
+            padding: 0.3rem 0.6rem;
+            border-radius: 50px;
+            font-weight: 600;
+            font-size: 0.8rem;
+        }
+
+        .ventas-count {
+            background-color: rgba(52, 152, 219, 0.1);
+            color: var(--primary-color);
+            padding: 0.3rem 0.6rem;
+            border-radius: 50px;
+            font-weight: 600;
+            font-size: 0.8rem;
+        }
+
+        .food-count {
+            background-color: rgba(230, 126, 34, 0.1);
+            color: var(--food-color);
+            padding: 0.3rem 0.6rem;
+            border-radius: 50px;
+            font-weight: 600;
+            font-size: 0.8rem;
+        }
+
+        @@media (max-width: 992px) {
+            .stats-card .stats-value {
+                font-size: 1.8rem;
+            }
+
+            .stats-card i {
+                font-size: 2.5rem;
+            }
+        }
+
+        @@media (max-width: 768px) {
+            .status-summary {
+                flex-direction: column;
+                gap: 10px;
+            }
+
+            .stats-card {
+                padding: 20px 10px;
+            }
+
+                .stats-card .stats-value {
+                    font-size: 1.6rem;
+                }
+
+                .stats-card i {
+                    font-size: 2.2rem;
+                }
+        }
+    </style>
+}
+
+<div class="dashboard-header">
+    <div class="container">
+        <h1 class="dashboard-title"><i class="fas fa-tachometer-alt"></i> @ViewData["Title"]</h1>
+        <p class="dashboard-subtitle">Bienvenido al panel de control del gerente. Aquí puedes ver un resumen del estado actual del restaurante.</p>
+    </div>
+</div>
+
+<div class="container">
+    <!-- Estadísticas rápidas -->
+    <div class="row">
+        <div class="col-md-2 col-6">
+            <div class="stats-card card-meseros">
+                <i class="fas fa-user-tie"></i>
+                <div class="stats-value">@ViewBag.TotalMeseros</div>
+                <div class="stats-label">Meseros</div>
+            </div>
+        </div>
+        <div class="col-md-2 col-6">
+            <div class="stats-card card-cocineros">
+                <i class="fas fa-utensils"></i>
+                <div class="stats-value">@ViewBag.TotalCocineros</div>
+                <div class="stats-label">Cocineros</div>
+            </div>
+        </div>
+        <div class="col-md-2 col-6">
+            <div class="stats-card card-platos">
+                <i class="fas fa-utensil-spoon"></i>
+                <div class="stats-value">@ViewBag.TotalPlatos</div>
+                <div class="stats-label">Platos</div>
+            </div>
+        </div>
+        <div class="col-md-2 col-6">
+            <div class="stats-card card-ventas">
+                <i class="fas fa-dollar-sign"></i>
+                <div class="stats-value">@ViewBag.TotalVentas.ToString("C")</div>
+                <div class="stats-label">Ventas</div>
+            </div>
+        </div>
+        <div class="col-md-2 col-6">
+            <div class="stats-card card-mesas">
+                <i class="fas fa-table"></i>
+                <div class="stats-value">@ViewBag.TotalMesas</div>
+                <div class="stats-label">Mesas</div>
+            </div>
+        </div>
+        <div class="col-md-2 col-6">
+            <div class="stats-card card-pedidos">
+                <i class="fas fa-clipboard-list"></i>
+                <div class="stats-value">@ViewBag.Pedidos.Count</div>
+                <div class="stats-label">Pedidos</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mt-4">
+        <!-- Sección de Top Meseros -->
+        <div class="col-lg-4 col-md-6">
+            <div class="card">
+                <div class="card-header card-header-primary">
+                    <i class="fas fa-trophy"></i> Top Meseros
+                </div>
+                <div class="card-body">
+                    @if (meseros != null && meseros.Any())
+                    {
+                        var maxVentas = meseros.Max(m => m.total_ventas) ?? 0;
+
+                        foreach (var mesero in meseros)
+                        {
+                            <div class="mesero-item">
+                                <div class="mesero-avatar">@mesero.nombre?.Substring(0, 1)</div>
+                                <div class="flex-grow-1">
+                                    <div class="fw-bold">@mesero.nombre</div>
+                                    <div class="small text-muted">@(mesero.numero_pedidos ?? 0) pedidos</div>
+                                    <div class="progress progress-thin">
+                                        <div class="progress-bar"
+                                             style="width: @((maxVentas == 0 ? 0 : (mesero.total_ventas ?? 0) * 100 / maxVentas))%"></div>
+                                    </div>
+                                </div>
+                                <div class="text-end">
+                                    <span class="ventas-count">
+                                        <i class="fas fa-dollar-sign"></i> @((mesero.total_ventas ?? 0).ToString("C"))
+                                    </span>
+                                </div>
+                            </div>
+                        }
+                    }
+                    else
+                    {
+                        <div class="empty-state">
+                            <i class="fas fa-user-tie"></i>
+                            <p>No hay datos de meseros disponibles</p>
+                        </div>
+                    }
+                </div>
+                <div class="card-footer text-center">
+                    <a asp-controller="Meseros" asp-action="Index" class="btn btn-sm btn-outline-primary btn-outline-custom">Ver todos</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sección de Platos Más Vendidos -->
+        <div class="col-lg-4 col-md-6">
+            <div class="card">
+                <div class="card-header card-header-food">
+                    <i class="fas fa-fire"></i> Platos Más Vendidos
+                </div>
+                <div class="card-body">
+                    @if (platos != null && platos.Any())
+                    {
+                        var maxVentas = platos.Max(p => p.cantidad_vendida);
+
+                        foreach (var plato in platos)
+                        {
+                            <div class="plato-item">
+                                @if (!string.IsNullOrEmpty(plato.imagen))
+                                {
+                                    <img src="@plato.imagen" class="plato-img" alt="@plato.nombre">
+                                }
+                                else
+                                {
+                                    <div class="plato-img bg-light d-flex align-items-center justify-content-center">
+                                        <i class="fas fa-utensil-spoon text-muted"></i>
+                                    </div>
+                                }
+                                <div class="flex-grow-1">
+                                    <div class="fw-bold">@plato.nombre</div>
+                                    <div class="small text-muted">@plato.cantidad_vendida ventas</div>
+                                    <div class="progress progress-thin">
+                                        <div class="progress-bar" style="width: @((plato.cantidad_vendida * 100 / maxVentas))%"></div>
+                                    </div>
+                                </div>
+                                <div class="text-end">
+                                    <span class="food-count">
+                                        <i class="fas fa-dollar-sign"></i> @plato.ingresos_generados.ToString("C")
+                                    </span>
+                                </div>
+                            </div>
+                        }
+                    }
+                    else
+                    {
+                        <div class="empty-state">
+                            <i class="fas fa-utensils"></i>
+                            <p>No hay datos de platos disponibles</p>
+                        </div>
+                    }
+                </div>
+                <div class="card-footer text-center">
+                    <a asp-controller="Platos" asp-action="Index" class="btn btn-sm btn-outline-custom" style="border-color: var(--food-color); color: var(--food-color);">Ver todos</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sección de Equipo de Cocina -->
+        <div class="col-lg-4 col-md-6">
+            <div class="card">
+                <div class="card-header card-header-chef">
+                    <i class="fas fa-cheese"></i> Equipo de Cocina
+                </div>
+                <div class="card-body">
+                    @if (cocineros != null && cocineros.Any())
+                    {
+                        var maxPlatos = cocineros.Max(c => c.platos_preparados);
+
+                        foreach (var cocinero in cocineros)
+                        {
+                            <div class="cocinero-item">
+                                <div class="cocinero-avatar">@cocinero.nombre?.Substring(0, 1)</div>
+                                <div class="flex-grow-1">
+                                    <div class="fw-bold">@cocinero.nombre</div>
+                                    <div class="small text-muted">
+                                        @if (!string.IsNullOrEmpty(cocinero.comentario))
+                                        {
+                                            @cocinero.comentario
+                                        }
+                                        else
+                                        {
+                                            <span class="text-muted font-italic">Sin comentarios</span>
+                                        }
+                                    </div>
+                                    <div class="progress progress-thin">
+                                        <div class="progress-bar" style="width: @((cocinero.platos_preparados * 100 / (maxPlatos == 0 ? 1 : maxPlatos)))%"></div>
+                                    </div>
+                                </div>
+                                <div class="text-end">
+                                    <span class="platos-count">
+                                        <i class="fas fa-utensils"></i> @cocinero.platos_preparados
+                                    </span>
+                                </div>
+                            </div>
+                        }
+                    }
+                    else
+                    {
+                        <div class="empty-state">
+                            <i class="fas fa-user-chef"></i>
+                            <p>No hay cocineros registrados</p>
+                        </div>
+                    }
+                </div>
+                <div class="card-footer text-center">
+                    <a asp-controller="Cocineros" asp-action="Index" class="btn btn-sm btn-outline-custom" style="border-color: var(--chef-color); color: var(--chef-color);">Ver todos</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Segunda fila de secciones -->
+    <div class="row mt-4">
+        <!-- Sección de Estado de Mesas -->
+        <div class="col-lg-6 col-md-12">
+            <div class="card">
+                <div class="card-header card-header-success">
+                    <i class="fas fa-table"></i> Estado de Mesas
+                </div>
+                <div class="card-body">
+                    <div class="status-summary">
+                        <div class="status-item">
+                            <span class="mesa-status-indicator mesa-status-libre"></span>
+                            <span class="status-text">Libres: @Model.Count(m => m.estado.ToLower() == "libre" || m.estado.ToLower() == "disponible")</span>
+                        </div>
+                        <div class="status-item">
+                            <span class="mesa-status-indicator mesa-status-ocupada"></span>
+                            <span class="status-text">Ocupadas: @Model.Count(m => m.estado.ToLower() == "ocupado" || m.estado.ToLower() == "ocupada")</span>
+                        </div>
+                        <div class="status-item">
+                            <span class="mesa-status-indicator mesa-status-reservada"></span>
+                            <span class="status-text">Reservadas: @Model.Count(m => m.estado.ToLower() == "reservado" || m.estado.ToLower() == "reservada")</span>
+                        </div>
+                    </div>
+
+                    <h6 class="mt-4 mb-3 fw-bold">Mesas recientes:</h6>
+                    @foreach (var mesa in Model.OrderByDescending(m => m.id_mesa).Take(5))
+                    {
+                        <div class="mesa-item @(mesa.estado.ToLower() == "libre" || mesa.estado.ToLower() == "disponible" ? "mesa-libre" :
+                          mesa.estado.ToLower() == "ocupado" || mesa.estado.ToLower() == "ocupada" ? "mesa-ocupada" : "mesa-reservada")">
+                            <div>
+                                <i class="fas fa-table"></i>
+                                <span>Mesa @mesa.id_mesa</span>
+                            </div>
+                            <div>
+                                <small>@mesa.estado</small>
+                            </div>
+                        </div>
+                    }
+
+                    <div class="text-center mt-3">
+                        <a asp-controller="Mesas" asp-action="Index" class="btn btn-sm btn-outline-success btn-outline-custom">Ver todas</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sección de Pedidos en Proceso -->
+        <div class="col-lg-6 col-md-12">
+            <div class="card">
+                <div class="card-header card-header-warning">
+                    <i class="fas fa-tasks"></i> Pedidos en Proceso
+                </div>
+                <div class="card-body">
+                    @if (ViewBag.Pedidos != null)
+                    {
+                        var pedidos = ViewBag.Pedidos as IEnumerable<Parcial.Models.pedidos_proceso>;
+                        if (pedidos.Any())
+                        {
+                            <div class="table-responsive">
+                                <table class="table table-hover">
+                                    <thead>
+                                        <tr>
+                                            <th>Cliente</th>
+                                            <th>Mesa</th>
+                                            <th>Mesero</th>
+                                            <th>Estado</th>
+                                            <th>Acciones</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach (var pedido in pedidos.OrderByDescending(p => p.fecha).Take(6))
+                                        {
+                                            <tr>
+                                                <td class="fw-bold">@pedido.cliente</td>
+                                                <td>
+                                                    <span class="badge bg-dark">@pedido.mesa_numero</span>
+                                                </td>
+                                                <td>@pedido.mesero</td>
+                                                <td>
+                                                    <div class="pedido-status">
+                                                        <span class="pedido-status-indicator
+                                                              @(pedido.estado.ToLower().Contains("prepar") ? "status-preparacion" :
+                                                                pedido.estado.ToLower().Contains("listo") ? "status-listo" : "status-entregado")"></span>
+                                                        @pedido.estado
+                                                    </div>
+                                                </td>
+                                                <td>
+                                                    <button class="btn btn-sm btn-outline-primary">
+                                                        <i class="fas fa-eye"></i> Detalles
+                                                    </button>
+                                                </td>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div class="text-center mt-3">
+                                <a href="#" class="btn btn-warning">Ver todos los pedidos</a>
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="empty-state">
+                                <i class="fas fa-clipboard-list"></i>
+                                <p>No hay pedidos en proceso actualmente</p>
+                            </div>
+                        }
+                    }
+                    else
+                    {
+                        <div class="alert alert-danger">
+                            <i class="fas fa-exclamation-triangle"></i> No se pudieron cargar los pedidos.
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="floating-action">
+    <button class="floating-btn" data-bs-toggle="tooltip" title="Acción rápida">
+        <i class="fas fa-plus"></i>
+    </button>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function() {
+            // Inicializar tooltips
+            $('[data-bs-toggle="tooltip"]').tooltip();
+
+            // Animación para las cards de estadísticas
+            $('.stats-card').each(function(index) {
+                $(this).css('opacity', 0).delay(index * 200).animate({opacity: 1}, 500);
+            });
+
+            // Efecto hover para los items
+            $('.mesero-item, .plato-item, .cocinero-item, .mesa-item').hover(
+                function() {
+                    $(this).css('transform', 'translateX(5px)');
+                },
+                function() {
+                    $(this).css('transform', 'translateX(0)');
+                }
+            );
+        });
+    </script>
+}

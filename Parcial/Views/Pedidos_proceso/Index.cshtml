@@ -1,0 +1,460 @@
+﻿@model IEnumerable<Parcial.Models.pedidos_proceso>
+
+@{
+    ViewData["Title"] = "Gestión de Pedidos en Proceso";
+    Layout = "_Layout";
+}
+
+@section Styles {
+    <style>
+        :root {
+            --primary-color: #5a67d8;
+            --primary-light: #a3bffa;
+            --success-color: #48bb78;
+            --info-color: #4299e1;
+            --warning-color: #ed8936;
+            --danger-color: #f56565;
+            --dark-color: #2d3748;
+            --light-color: #f7fafc;
+            --gray-color: #a0aec0;
+        }
+
+        .pedidos-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 2rem 0;
+            margin-bottom: 2rem;
+            border-radius: 0 0 20px 20px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .page-title {
+            font-weight: 700;
+            font-size: 1.8rem;
+            display: flex;
+            align-items: center;
+            margin: 0;
+        }
+
+            .page-title i {
+                margin-right: 15px;
+                font-size: 2rem;
+            }
+
+        .btn-add {
+            background-color: var(--success-color);
+            color: white;
+            font-weight: 600;
+            padding: 0.6rem 1.2rem;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            transition: all 0.3s ease;
+            border: none;
+            box-shadow: 0 2px 10px rgba(72, 187, 120, 0.3);
+        }
+
+            .btn-add:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 5px 15px rgba(72, 187, 120, 0.4);
+                background-color: #38a169;
+            }
+
+            .btn-add i {
+                margin-right: 8px;
+            }
+
+        .card-container {
+            background-color: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+            overflow: hidden;
+            margin-bottom: 2rem;
+        }
+
+        .card-header {
+            background-color: var(--dark-color);
+            color: white;
+            padding: 1.2rem 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .card-title {
+            font-weight: 600;
+            font-size: 1.2rem;
+            display: flex;
+            align-items: center;
+            margin: 0;
+        }
+
+            .card-title i {
+                margin-right: 10px;
+            }
+
+        .table {
+            margin-bottom: 0;
+            width: 100%;
+        }
+
+            .table thead th {
+                background-color: #f8f9fa;
+                color: var(--dark-color);
+                font-weight: 600;
+                text-transform: uppercase;
+                font-size: 0.75rem;
+                letter-spacing: 0.5px;
+                border-bottom-width: 1px;
+                padding: 1rem 1.5rem;
+            }
+
+            .table tbody td {
+                padding: 1rem 1.5rem;
+                vertical-align: middle;
+                border-top: 1px solid #f1f5f9;
+            }
+
+            .table tbody tr {
+                transition: all 0.2s ease;
+            }
+
+                .table tbody tr:hover {
+                    background-color: #f8fafc;
+                    transform: scale(1.005);
+                    box-shadow: 0 2px 15px rgba(0,0,0,0.05);
+                }
+
+        .status-badge {
+            padding: 0.5rem 0.8rem;
+            border-radius: 50px;
+            font-weight: 600;
+            font-size: 0.8rem;
+            display: inline-flex;
+            align-items: center;
+        }
+
+            .status-badge i {
+                margin-right: 5px;
+                font-size: 0.7rem;
+            }
+
+        .badge-listo {
+            background-color: rgba(72, 187, 120, 0.1);
+            color: var(--success-color);
+        }
+
+        .badge-preparando {
+            background-color: rgba(237, 137, 54, 0.1);
+            color: var(--warning-color);
+        }
+
+        .badge-retrasado {
+            background-color: rgba(245, 101, 101, 0.1);
+            color: var(--danger-color);
+        }
+
+        .badge-pendiente {
+            background-color: rgba(160, 174, 192, 0.1);
+            color: var(--gray-color);
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 0.5rem;
+            justify-content: center;
+        }
+
+        .btn-action {
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 8px;
+            transition: all 0.2s ease;
+        }
+
+        .btn-edit {
+            background-color: rgba(255, 193, 7, 0.1);
+            color: #ffc107;
+        }
+
+            .btn-edit:hover {
+                background-color: #ffc107;
+                color: white;
+            }
+
+        .btn-details {
+            background-color: rgba(102, 126, 234, 0.1);
+            color: var(--primary-color);
+        }
+
+            .btn-details:hover {
+                background-color: var(--primary-color);
+                color: white;
+            }
+
+        .btn-delete {
+            background-color: rgba(245, 101, 101, 0.1);
+            color: var(--danger-color);
+        }
+
+            .btn-delete:hover {
+                background-color: var(--danger-color);
+                color: white;
+            }
+
+        .table-footer {
+            background-color: #f8f9fa;
+            padding: 1rem 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-top: 1px solid #f1f5f9;
+        }
+
+        .summary-item {
+            display: flex;
+            align-items: center;
+            color: #4a5568;
+            font-size: 0.9rem;
+        }
+
+            .summary-item i {
+                margin-right: 8px;
+                color: var(--gray-color);
+            }
+
+        .summary-total {
+            font-weight: 700;
+            color: var(--dark-color);
+        }
+
+        .empty-state {
+            padding: 3rem 2rem;
+            text-align: center;
+        }
+
+        .empty-state-icon {
+            font-size: 3.5rem;
+            color: #e2e8f0;
+            margin-bottom: 1rem;
+        }
+
+        .empty-state-title {
+            font-size: 1.2rem;
+            color: #4a5568;
+            margin-bottom: 0.5rem;
+        }
+
+        .empty-state-description {
+            color: #718096;
+            margin-bottom: 1.5rem;
+            max-width: 400px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        @@media (max-width: 768px) {
+            .header-content {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 1rem;
+            }
+
+            .table-responsive {
+                border: 1px solid #f1f5f9;
+                border-radius: 8px;
+            }
+
+            .table-footer {
+                flex-direction: column;
+                gap: 1rem;
+                align-items: flex-start;
+            }
+        }
+    </style>
+}
+
+<div class="pedidos-header">
+    <div class="container">
+        <div class="header-content">
+            <h1 class="page-title">
+                <i class="fas fa-clipboard-list"></i> @ViewData["Title"]
+            </h1>
+            <a asp-action="Create" class="btn btn-add">
+                <i class="fas fa-plus"></i> Nuevo Pedido
+            </a>
+        </div>
+    </div>
+</div>
+
+<div class="container">
+    <div class="card-container">
+        <div class="card-header">
+            <div class="card-title">
+                <i class="fas fa-list"></i> Listado de Pedidos Activos
+            </div>
+        </div>
+
+        @if (Model.Any())
+        {
+            <div class="table-responsive">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Cliente</th>
+                            <th>Mesa</th>
+                            <th>Mesero</th>
+                            <th>Estado</th>
+                            <th>Fecha/Hora</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model.OrderByDescending(p => p.fecha))
+                        {
+                            <tr>
+                                <td>
+                                    <strong>@item.cliente</strong>
+                                </td>
+                                <td>
+                                    <span class="badge bg-secondary rounded-pill px-3 py-2">
+                                        Mesa @item.mesa_numero
+                                    </span>
+                                </td>
+                                <td>
+                                    @item.mesero
+                                </td>
+                                <td>
+                                    <span class="status-badge @GetStatusBadgeClass(item.estado)">
+                                        <i class="@GetStatusIcon(item.estado)"></i> @item.estado
+                                    </span>
+                                </td>
+                                <td>
+                                    @item.fecha <!-- Simplemente muestra el string tal cual -->
+                                </td>
+                                <td>
+                                    <div class="action-buttons">
+                                        <a asp-action="Edit" asp-route-id="@item.id_pedido" class="btn-action btn-edit" title="Editar">
+                                            <i class="fas fa-edit"></i>
+                                        </a>
+                                        <a asp-action="Details" asp-route-id="@item.id_pedido" class="btn-action btn-details" title="Detalles">
+                                            <i class="fas fa-eye"></i>
+                                        </a>
+                                        <a asp-action="Delete" asp-route-id="@item.id_pedido" class="btn-action btn-delete" title="Eliminar">
+                                            <i class="fas fa-trash"></i>
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                    <tfoot>
+                        <tr>
+                            <td colspan="5" class="text-end fw-bold">Total de pedidos:</td>
+                            <td class="fw-bold">@Model.Count()</td>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+
+            <div class="table-footer">
+                <div class="summary-item">
+                    <i class="fas fa-clipboard-list"></i>
+                    <span>Pedidos activos: <span class="summary-total">@Model.Count()</span></span>
+                </div>
+                <div class="status-summary">
+                    <div class="status-summary-item">
+                        <span class="status-indicator indicator-listo"></span>
+                        <span>@Model.Count(p => p.estado?.ToLower() == "listo") Listos</span>
+                    </div>
+                    <div class="status-summary-item">
+                        <span class="status-indicator indicator-preparando"></span>
+                        <span>@Model.Count(p => p.estado?.ToLower() == "preparando") Preparando</span>
+                    </div>
+                    <div class="status-summary-item">
+                        <span class="status-indicator indicator-retrasado"></span>
+                        <span>@Model.Count(p => p.estado?.ToLower() == "retrasado") Retrasados</span>
+                    </div>
+                </div>
+            </div>
+        }
+        else
+        {
+            <div class="empty-state">
+                <div class="empty-state-icon">
+                    <i class="fas fa-clipboard-list"></i>
+                </div>
+                <h3 class="empty-state-title">No hay pedidos en proceso</h3>
+                <p class="empty-state-description">
+                    Actualmente no hay pedidos activos en el sistema.
+                </p>
+                <a asp-action="Create" class="btn btn-add">
+                    <i class="fas fa-plus"></i> Crear primer pedido
+                </a>
+            </div>
+        }
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function() {
+            // Inicializar tooltips
+            $('[title]').tooltip();
+
+            // Animación para filas de la tabla
+            $('tbody tr').each(function(i) {
+                $(this).delay(i * 100).animate({
+                    opacity: 1
+                }, 200);
+            }).css('opacity', 0);
+        });
+    </script>
+}
+
+@functions {
+    public string GetStatusBadgeClass(string estado)
+    {
+        if (string.IsNullOrEmpty(estado))
+            return "badge-pendiente";
+
+        switch (estado.ToLower())
+        {
+            case "listo":
+                return "badge-listo";
+            case "preparando":
+                return "badge-preparando";
+            case "retrasado":
+                return "badge-retrasado";
+            default:
+                return "badge-pendiente";
+        }
+    }
+
+    public string GetStatusIcon(string estado)
+    {
+        if (string.IsNullOrEmpty(estado))
+            return "fas fa-clock";
+
+        switch (estado.ToLower())
+        {
+            case "listo":
+                return "fas fa-check-circle";
+            case "preparando":
+                return "fas fa-utensils";
+            case "retrasado":
+                return "fas fa-exclamation-circle";
+            default:
+                return "fas fa-clock";
+        }
+    }
+}

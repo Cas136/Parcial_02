@@ -1,0 +1,358 @@
+﻿@model IEnumerable<Parcial.Models.cocineros>
+
+@{
+    ViewData["Title"] = "Gestión de Cocineros";
+    Layout = "_Layout";
+}
+
+@section Styles {
+    <style>
+        :root {
+            --primary-color: #5a67d8;
+            --primary-light: #a3bffa;
+            --success-color: #48bb78;
+            --info-color: #4299e1;
+            --warning-color: #ed8936;
+            --danger-color: #f56565;
+            --dark-color: #2d3748;
+            --light-color: #f7fafc;
+            --gray-color: #a0aec0;
+        }
+
+        .cocineros-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 2rem 0;
+            margin-bottom: 2rem;
+            border-radius: 0 0 20px 20px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .page-title {
+            font-weight: 700;
+            font-size: 1.8rem;
+            display: flex;
+            align-items: center;
+            margin: 0;
+        }
+
+            .page-title i {
+                margin-right: 15px;
+                font-size: 2rem;
+            }
+
+        .btn-add {
+            background-color: var(--success-color);
+            color: white;
+            font-weight: 600;
+            padding: 0.6rem 1.2rem;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            transition: all 0.3s ease;
+            border: none;
+            box-shadow: 0 2px 10px rgba(72, 187, 120, 0.3);
+        }
+
+            .btn-add:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 5px 15px rgba(72, 187, 120, 0.4);
+                background-color: #38a169;
+            }
+
+            .btn-add i {
+                margin-right: 8px;
+            }
+
+        .card-container {
+            background-color: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+            overflow: hidden;
+            margin-bottom: 2rem;
+        }
+
+        .card-header {
+            background-color: var(--dark-color);
+            color: white;
+            padding: 1.2rem 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .card-title {
+            font-weight: 600;
+            font-size: 1.2rem;
+            display: flex;
+            align-items: center;
+            margin: 0;
+        }
+
+            .card-title i {
+                margin-right: 10px;
+            }
+
+        .table {
+            margin-bottom: 0;
+            width: 100%;
+        }
+
+            .table thead th {
+                background-color: #f8f9fa;
+                color: var(--dark-color);
+                font-weight: 600;
+                text-transform: uppercase;
+                font-size: 0.75rem;
+                letter-spacing: 0.5px;
+                border-bottom-width: 1px;
+                padding: 1rem 1.5rem;
+            }
+
+            .table tbody td {
+                padding: 1rem 1.5rem;
+                vertical-align: middle;
+                border-top: 1px solid #f1f5f9;
+            }
+
+            .table tbody tr {
+                transition: all 0.2s ease;
+            }
+
+                .table tbody tr:hover {
+                    background-color: #f8fafc;
+                    transform: scale(1.005);
+                    box-shadow: 0 2px 15px rgba(0,0,0,0.05);
+                }
+
+        .avatar-cocinero {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: var(--primary-color);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            margin-right: 10px;
+        }
+
+        .cocinero-name {
+            display: flex;
+            align-items: center;
+        }
+
+        .badge-platos {
+            background-color: rgba(66, 153, 225, 0.1);
+            color: var(--info-color);
+            padding: 0.5rem 0.8rem;
+            border-radius: 50px;
+            font-weight: 600;
+            font-size: 0.8rem;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .btn-action {
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 8px;
+            transition: all 0.2s ease;
+        }
+
+        .btn-edit {
+            background-color: rgba(255, 193, 7, 0.1);
+            color: #ffc107;
+        }
+
+            .btn-edit:hover {
+                background-color: #ffc107;
+                color: white;
+            }
+
+        .btn-details {
+            background-color: rgba(102, 126, 234, 0.1);
+            color: var(--primary-color);
+        }
+
+            .btn-details:hover {
+                background-color: var(--primary-color);
+                color: white;
+            }
+
+        .btn-delete {
+            background-color: rgba(245, 101, 101, 0.1);
+            color: var(--danger-color);
+        }
+
+            .btn-delete:hover {
+                background-color: var(--danger-color);
+                color: white;
+            }
+
+        .empty-state {
+            padding: 3rem 2rem;
+            text-align: center;
+        }
+
+        .empty-state-icon {
+            font-size: 3.5rem;
+            color: #e2e8f0;
+            margin-bottom: 1rem;
+        }
+
+        .empty-state-title {
+            font-size: 1.2rem;
+            color: #4a5568;
+            margin-bottom: 0.5rem;
+        }
+
+        .empty-state-description {
+            color: #718096;
+            margin-bottom: 1.5rem;
+            max-width: 400px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        @@media (max-width: 768px) {
+            .header-content {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 1rem;
+            }
+
+            .action-buttons {
+                flex-direction: column;
+                gap: 0.5rem;
+            }
+        }
+    </style>
+}
+
+<div class="cocineros-header">
+    <div class="container">
+        <div class="header-content">
+            <h1 class="page-title">
+                <i class="fas fa-utensils"></i> @ViewData["Title"]
+            </h1>
+            <a asp-action="Create" class="btn btn-add">
+                <i class="fas fa-plus"></i> Nuevo Cocinero
+            </a>
+        </div>
+        <p class="lead mb-0">Administra el equipo de cocina y su productividad</p>
+    </div>
+</div>
+
+<div class="container">
+    <div class="card-container">
+        <div class="card-header">
+            <div class="card-title">
+                <i class="fas fa-list"></i> Listado de Cocineros
+            </div>
+        </div>
+
+        @if (Model.Any())
+        {
+            <div class="table-responsive">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Cocinero</th>
+                            <th>Platos Preparados</th>
+                            <th>Comentario</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model)
+                        {
+                            <tr>
+                                <td>
+                                    <div class="cocinero-name">
+                                        <div class="avatar-cocinero">
+                                            @item.nombre.Substring(0, 1)
+                                        </div>
+                                        <strong>@item.nombre</strong>
+                                    </div>
+                                </td>
+                                <td>
+                                    <span class="badge-platos">
+                                        <i class="fas fa-utensils"></i> @item.platos_preparados
+                                    </span>
+                                </td>
+                                <td>
+                                    @if (!string.IsNullOrEmpty(item.comentario))
+                                    {
+                                        <span class="text-muted">@item.comentario</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="text-muted font-italic">Sin comentarios</span>
+                                    }
+                                </td>
+                                <td>
+                                    <div class="action-buttons">
+                                        <a asp-action="Edit" asp-route-id="@item.id_cocinero" class="btn-action btn-edit" title="Editar">
+                                            <i class="fas fa-edit"></i>
+                                        </a>
+                                        <a asp-action="Details" asp-route-id="@item.id_cocinero" class="btn-action btn-details" title="Detalles">
+                                            <i class="fas fa-eye"></i>
+                                        </a>
+                                        <a asp-action="Delete" asp-route-id="@item.id_cocinero" class="btn-action btn-delete" title="Eliminar">
+                                            <i class="fas fa-trash"></i>
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+        else
+        {
+            <div class="empty-state">
+                <div class="empty-state-icon">
+                    <i class="fas fa-user-chef"></i>
+                </div>
+                <h3 class="empty-state-title">No hay cocineros registrados</h3>
+                <p class="empty-state-description">
+                    Comienza agregando nuevos cocineros al equipo de cocina
+                </p>
+                <a asp-action="Create" class="btn btn-add mt-3">
+                    <i class="fas fa-plus"></i> Agregar Primer Cocinero
+                </a>
+            </div>
+        }
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function() {
+            // Inicializar tooltips
+            $('[title]').tooltip();
+
+            // Animación para filas de la tabla
+            $('tbody tr').each(function(i) {
+                $(this).delay(i * 100).animate({
+                    opacity: 1
+                }, 200);
+            }).css('opacity', 0);
+        });
+    </script>
+}
